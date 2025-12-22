@@ -1,26 +1,25 @@
 plugins {
-    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `maven-publish`
     `java-gradle-plugin`
 }
 
+group = "com.github.majid-khosravi"
+version = "0.3"
+
 repositories {
-    // Use Maven Central for resolving dependencies
     mavenCentral()
 }
-group = "com.github.majid-khosravi"
-
 
 dependencies {
-    // Use JUnit test framework for unit tests
     testImplementation("junit:junit:4.13")
 }
 
 gradlePlugin {
-    // Define the plugin
     val greeting by plugins.creating {
         id = "ir.majidkhosravi.archplug"
         implementationClass = "ir.majidkhosravi.archplug.CreateFeaturePlugin"
+        displayName = "ArchPlug Gradle Plugin"
+        description = "A Gradle plugin for architecture features"
     }
 }
 
@@ -42,14 +41,67 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
 }
 
 tasks.check {
-    // Run the functional tests as part of `check`
     dependsOn(functionalTestTask)
 }
 
-afterEvaluate {
-    publishing {
-        publications.withType<MavenPublication> {
-            artifactId = "ArchPlug"
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+
+            pom {
+                name.set("ArchPlug")
+                description.set("A Gradle plugin for architecture features")
+                url.set("https://github.com/majid-khosravi/ArchPlug")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("majid-khosravi")
+                        name.set("Majid Khosravi")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/majid-khosravi/ArchPlug.git")
+                    developerConnection.set("scm:git:ssh://github.com/majid-khosravi/ArchPlug.git")
+                    url.set("https://github.com/majid-khosravi/ArchPlug")
+                }
+            }
+        }
+    }
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes(
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version
+        )
+    }
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+val javadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc)
+}
+
+publishing {
+    publications {
+        withType<MavenPublication> {
+            artifact(sourcesJar.get())
+            artifact(javadocJar.get())
         }
     }
 }
