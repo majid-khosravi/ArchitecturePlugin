@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.github.majid-khosravi"
-version = "0.3"
+version = "0.4"
 
 repositories {
     mavenCentral()
