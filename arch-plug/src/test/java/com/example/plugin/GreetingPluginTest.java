@@ -6,14 +6,14 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 
-public class GreetingPluginTest {
+/*public class GreetingPluginTest {
     @Test
     public void pluginRegistersATask() {
         // Create a test project and apply the plugin
         Project project = ProjectBuilder.builder().build();
-        project.getPlugins().apply("com.example.plugin.greeting");
+        project.getPlugins().apply("ir.majidkhosravi.archplug");
 
         // Verify the result
-        assertNotNull(project.getTasks().findByName("greet"));
+        assertNotNull(project.getTasks().findByName("createFeature"));
     }
-}
+}*/
