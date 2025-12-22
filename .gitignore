@@ -4,3 +4,15 @@
 /arch-plug/build/classes/java/main/
 /arch-plug/build/classes/java/test/
 /build/
+*.iml
+.idea/
+.gradle/
+build/
+*.log
+local.properties
+out/
+.cxx/
+*.hprof
+build-cache/
+tmp/
+site/

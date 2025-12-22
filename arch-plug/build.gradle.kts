@@ -1,5 +1,6 @@
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
+    `maven-publish`
     `java-gradle-plugin`
 }
 
@@ -23,6 +24,12 @@ gradlePlugin {
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 // Add a source set and a task for a functional test suite
 val functionalTest by sourceSets.creating
 gradlePlugin.testSourceSets(functionalTest)
@@ -37,4 +44,12 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
 tasks.check {
     // Run the functional tests as part of `check`
     dependsOn(functionalTestTask)
+}
+
+afterEvaluate {
+    publishing {
+        publications.withType<MavenPublication> {
+            artifactId = "ArchPlug"
+        }
+    }
 }
