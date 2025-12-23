@@ -1,10 +1,11 @@
 plugins {
+    `kotlin-dsl`
     `maven-publish`
     `java-gradle-plugin`
 }
 
 group = "com.github.majid-khosravi"
-version = "0.5"
+version = "0.5.1"
 
 repositories {
     mavenCentral()

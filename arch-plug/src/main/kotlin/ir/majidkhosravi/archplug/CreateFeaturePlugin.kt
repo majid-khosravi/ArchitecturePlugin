@@ -1,6 +1,7 @@
 package ir.majidkhosravi.archplug
 
-import java
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 import java.io.File
 import java.util.Locale
 
@@ -8,26 +9,22 @@ open class ArchPluginExtension {
     var packageName: String = "com.example.app"
 }
 
-class CreateFeaturePlugin : org.gradle.api.Plugin<org.gradle.api.Project> {
+class CreateFeaturePlugin : Plugin<Project> {
 
-    override fun apply(project: org.gradle.api.Project) {
-        val extension = org.gradle.api.plugins.ExtensionContainer.create(
-            "archConfig",
-            ArchPluginExtension::class.java
-        )
+    override fun apply(project: Project) {
+        val extension = project.extensions.create("archConfig", ArchPluginExtension::class.java)
 
-        org.gradle.api.tasks.TaskContainer.register("createFeature") {
-            org.gradle.api.Task.setGroup = "architecture"
-            org.gradle.api.Task.setDescription =
-                "Generates clean architecture layers with dynamic package name"
+        project.tasks.register("createFeature") { task ->
+            task.group = "architecture"
+            task.description = "Generates clean architecture layers with dynamic package name"
 
-            org.gradle.api.Task.doLast {
+            task.doLast {
                 val basePackage = extension.packageName
 
-                val feature = org.gradle.api.Project.findProperty("feature") as String?
-                    ?: throw java.lang.IllegalArgumentException("❌ Error: Please provide a feature name. Usage: ./gradlew createFeature -Pfeature=User")
+                val feature = project.findProperty("feature") as String?
+                    ?: throw IllegalArgumentException("❌ Error: Please provide a feature name. Usage: ./gradlew createFeature -Pfeature=User")
 
-                val featureLower = feature.lowercase(java.util.Locale.US)
+                val featureLower = feature.lowercase(Locale.US)
                 val basePackagePath = basePackage.replace(".", "/")
 
                 val modulesPathMap = mapOf(
@@ -62,14 +59,17 @@ class CreateFeaturePlugin : org.gradle.api.Plugin<org.gradle.api.Project> {
 
                 filesByModule.forEach { (moduleName, paths) ->
                     val moduleRootPath = modulesPathMap[moduleName] ?: return@forEach
-                    val baseDir = java.io.File(org.gradle.api.Project.getRootDir, moduleRootPath)
+                    val baseDir = File(project.rootDir, moduleRootPath)
 
                     paths.forEach { relativePath ->
                         val file = baseDir.resolve(relativePath)
                         val subFolder = relativePath.substringBeforeLast("/", "").replace("/", ".")
 
-                        val finalPackage =
-                            if (subFolder.isNotEmpty()) "$basePackage.$moduleName.$subFolder" else "$basePackage.$moduleName"
+                        val finalPackage = if (subFolder.isNotEmpty())
+                            "$basePackage.$moduleName.$subFolder"
+                        else
+                            "$basePackage.$moduleName"
+
                         val className = file.nameWithoutExtension
 
                         if (!file.exists()) {
